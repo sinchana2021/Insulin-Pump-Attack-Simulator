@@ -5,7 +5,11 @@ import java.beans.PropertyChangeListener;
 
 public class WorldPanel extends JPanel implements PropertyChangeListener {
 
-    private final GlucoseSensor sensor = new GlucoseSensor(200, 200);
+    private final GlucoseSensor sensor = new GlucoseSensor(100, 100);
+    private final InsulinPump pump = new InsulinPump(250, 250);
+    private final PDA pda = new PDA(400, 10);
+    private final RemoteControl rc = new RemoteControl(10, 250);
+
 
     public WorldPanel() {
         setBackground(new Color(172, 248, 199));
@@ -17,6 +21,9 @@ public class WorldPanel extends JPanel implements PropertyChangeListener {
         super.paintComponent(g);
         drawGrid(g);
         sensor.draw(g);
+        pump.draw(g);
+        pda.draw(g);
+        rc.draw(g);
     }
 
     private void drawGrid(Graphics g) {
