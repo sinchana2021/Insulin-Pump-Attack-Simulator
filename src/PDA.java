@@ -1,9 +1,11 @@
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * PDA represents the Personal Data Assistant — a database that stores
- * glucose readings and insulin delivery history. Visualized as a cylinder
- * with a data-input box and arrow on the left indicating writes.
+ * PDA represents the Personal Data Assistant. Visualized as a handheld
+ * device with a dark log screen that displays a running list of commands
+ * and glucose readings received over MQTT.
  *
  * @author you
  * @version 1.0
@@ -13,100 +15,101 @@ public class PDA {
     private int x;
     private int y;
 
-    // Cylinder dimensions
-    private static final int CYL_W       = 140;
-    private static final int CYL_H       = 160;
-    private static final int ELLIPSE_RX  = 70;
-    private static final int ELLIPSE_RY  = 18;
+    private static final int BODY_W   = 150;
+    private static final int BODY_H   = 230;
+    private static final int SCREEN_W = 118;  // BODY_W - 32
+    private static final int SCREEN_H = 185;  // BODY_H - 45
+    private static final int MAX_LINES = 13; // max visible log lines
 
-    // Input box dimensions
-    private static final int BOX_W = 110;
-    private static final int BOX_H = 50;
+    private final List<String> log = new ArrayList<>();
 
     public PDA(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
+    /** Call this from MQTTClient whenever a message arrives. */
+    public void addLogEntry(String entry) {
+        log.add(entry);
+        if (log.size() > MAX_LINES) {
+            log.remove(0); // scroll up — drop oldest line
+        }
+    }
+
     public void draw(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        drawInputBox(g2);
-        drawArrow(g2);
-        drawCylinder(g2);
+        drawBody(g2);
+        drawScreen(g2);
+        drawLog(g2);
     }
 
-    /** Input box to the left of the cylinder. */
-    private void drawInputBox(Graphics2D g) {
-        int bx = x - BOX_W - 60;
-        int by = y + CYL_H / 2 - BOX_H / 2;
-
-        g.setColor(new Color(232, 230, 225));
-        g.fillRoundRect(bx, by, BOX_W, BOX_H, 8, 8);
+    /** Outer rounded-rectangle body. */
+    private void drawBody(Graphics2D g) {
+        g.setColor(new Color(214, 212, 207));
+        g.fillRoundRect(x, y, BODY_W, BODY_H, 28, 28);
         g.setColor(new Color(176, 174, 169));
-        g.setStroke(new BasicStroke(1.0f));
-        g.drawRoundRect(bx, by, BOX_W, BOX_H, 8, 8);
-
-        g.setColor(new Color(95, 94, 90));
-        g.setFont(new Font("SansSerif", Font.PLAIN, 11));
-        FontMetrics fm = g.getFontMetrics();
-        String line1 = "Incoming";
-        String line2 = "data";
-        int cx = bx + BOX_W / 2;
-        g.drawString(line1, cx - fm.stringWidth(line1) / 2, by + 18);
-        g.drawString(line2, cx - fm.stringWidth(line2) / 2, by + 33);
-    }
-
-    /** Arrow from input box to cylinder. */
-    private void drawArrow(Graphics2D g) {
-        int arrowStartX = x - 60;
-        int arrowEndX   = x;
-        int arrowY      = y + CYL_H / 2;
-
-        g.setColor(new Color(136, 135, 128));
         g.setStroke(new BasicStroke(1.5f));
-        g.drawLine(arrowStartX, arrowY, arrowEndX - 10, arrowY);
+        g.drawRoundRect(x, y, BODY_W, BODY_H, 28, 28);
 
-        // arrowhead
-        int[] ax = {arrowEndX - 10, arrowEndX - 20, arrowEndX - 20};
-        int[] ay = {arrowY, arrowY - 6, arrowY + 6};
-        g.setColor(new Color(136, 135, 128));
-        g.fillPolygon(ax, ay, 3);
+        // inner inset
+        g.setColor(new Color(232, 230, 225));
+        g.fillRoundRect(x + 10, y + 10, BODY_W - 20, BODY_H - 20, 20, 20);
+        g.setColor(new Color(200, 198, 193));
+        g.setStroke(new BasicStroke(0.5f));
+        g.drawRoundRect(x + 10, y + 10, BODY_W - 20, BODY_H - 20, 20, 20);
     }
 
-    /** Database cylinder: body rect + top and bottom ellipses + ring lines. */
-    private void drawCylinder(Graphics2D g) {
-        // body
-        g.setColor(new Color(181, 212, 244));
-        g.fillRect(x, y + ELLIPSE_RY, CYL_W, CYL_H);
+    /** Dark screen background with header bar. */
+    private void drawScreen(Graphics2D g) {
+        int sx = x + (BODY_W - SCREEN_W) / 2;
+        int sy = y + 25;
 
-        // dashed ring lines
-        g.setColor(new Color(55, 138, 221));
-        g.setStroke(new BasicStroke(0.5f, BasicStroke.CAP_BUTT,
-                BasicStroke.JOIN_MITER, 1f, new float[]{4f, 3f}, 0f));
-        for (int i = 1; i <= 3; i++) {
-            int ry = y + ELLIPSE_RY + (CYL_H / 4) * i;
-            g.drawOval(x, ry - ELLIPSE_RY, CYL_W, ELLIPSE_RY * 2);
-        }
+        // screen background
+        g.setColor(new Color(26, 26, 46));
+        g.fillRoundRect(sx, sy, SCREEN_W, SCREEN_H, 6, 6);
+        g.setColor(new Color(68, 68, 68));
         g.setStroke(new BasicStroke(1.0f));
+        g.drawRoundRect(sx, sy, SCREEN_W, SCREEN_H, 6, 6);
 
-        // bottom ellipse (drawn before top so top overlaps cleanly)
-        g.setColor(new Color(133, 183, 235));
-        g.fillOval(x, y + ELLIPSE_RY + CYL_H - ELLIPSE_RY, CYL_W, ELLIPSE_RY * 2);
-        g.setColor(new Color(55, 138, 221));
-        g.drawOval(x, y + ELLIPSE_RY + CYL_H - ELLIPSE_RY, CYL_W, ELLIPSE_RY * 2);
+        // header bar
+        g.setColor(new Color(42, 42, 74));
+        g.fillRoundRect(sx, sy, SCREEN_W, 22, 6, 6);
+        g.fillRect(sx, sy + 10, SCREEN_W, 12); // square off bottom of header
 
-        // cylinder outline sides
-        g.setColor(new Color(55, 138, 221));
-        g.drawLine(x, y + ELLIPSE_RY, x, y + ELLIPSE_RY + CYL_H);
-        g.drawLine(x + CYL_W, y + ELLIPSE_RY, x + CYL_W, y + ELLIPSE_RY + CYL_H);
+        // header text
+        g.setColor(new Color(136, 136, 204));
+        g.setFont(new Font("Monospaced", Font.BOLD, 10));
+        FontMetrics fm = g.getFontMetrics();
+        String title = "COMMAND LOG";
+        g.drawString(title, sx + (SCREEN_W - fm.stringWidth(title)) / 2, sy + 15);
+    }
 
-        // top ellipse
-        g.setColor(new Color(230, 241, 251));
-        g.fillOval(x, y, CYL_W, ELLIPSE_RY * 2);
-        g.setColor(new Color(55, 138, 221));
-        g.drawOval(x, y, CYL_W, ELLIPSE_RY * 2);
+    /** Scrolling log entries on the screen. */
+    private void drawLog(Graphics2D g) {
+        int sx = x + (BODY_W - SCREEN_W) / 2 + 8;
+        int sy = y + 25 + 22 + 12; // below header
+
+        g.setFont(new Font("Monospaced", Font.PLAIN, 9));
+        FontMetrics fm = g.getFontMetrics();
+        int lineH = fm.getHeight() + 2;
+
+        for (int i = 0; i < log.size(); i++) {
+            String entry = log.get(i);
+            // colour alerts yellow, everything else green
+            if (entry.contains("ALERT")) {
+                g.setColor(new Color(204, 204, 68));
+            } else {
+                g.setColor(new Color(68, 204, 136));
+            }
+            g.drawString(entry, sx, sy + (i * lineH) + fm.getAscent());
+        }
+
+        // blinking cursor at end of log
+        g.setColor(new Color(68, 204, 136));
+        int cursorY = sy + (log.size() * lineH) + fm.getAscent();
+        g.drawString("▮", sx, cursorY);
     }
 
     // --- Getters / Setters ---

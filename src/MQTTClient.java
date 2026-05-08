@@ -1,5 +1,7 @@
 
 import org.eclipse.paho.client.mqttv3.*;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class MQTTClient implements MqttCallback {
     private static final String BROKER   = "tcp://localhost:1883";
@@ -31,6 +33,13 @@ public class MQTTClient implements MqttCallback {
         if (TOPIC_DOSE.equals(topic)) {
             double dose = Double.parseDouble(payload);
             Blackboard.getInstance().setInsulinDose(dose);
+
+            String timestamp = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+            Blackboard.getInstance().getPDA().addLogEntry("[" + timestamp + "] DOSE: " + dose + " units");
+        }
+        if (TOPIC_GLUCOSE.equals(topic)) {
+            String timestamp = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+            Blackboard.getInstance().getPDA().addLogEntry("[" + timestamp + "] GLUCOSE: " + payload + " mg/dL");
         }
     }
 
