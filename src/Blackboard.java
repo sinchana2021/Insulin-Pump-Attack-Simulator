@@ -8,8 +8,11 @@ public class Blackboard {
     private double glucoseLevel = 100.0;  // mg/dL
     private double insulinDose  = 0.0;    // units
     private PDA pda = new PDA(380, 10);
+    private InsulinPump pump = new InsulinPump(250, 250);
 
     public PDA getPDA() { return pda; }
+
+    public InsulinPump getInsulinPump() { return pump; }
 
     public static Blackboard getInstance() {
         if (instance == null) instance = new Blackboard();

@@ -20,6 +20,10 @@ public class InsulinPump {
     private static final int SCREEN_H = 80;
     private static final int BTN_R   = 22;
 
+    private String screenText = "Waiting...";
+
+    public void setScreenText(String text) { this.screenText = text; }
+
     public InsulinPump(int x, int y) {
         this.x = x;
         this.y = y;
@@ -56,11 +60,32 @@ public class InsulinPump {
     private void drawScreen(Graphics2D g) {
         int sx = x + 22;
         int sy = y + 22;
+
         g.setColor(new Color(200, 223, 200));
         g.fillRoundRect(sx, sy, SCREEN_W, SCREEN_H, 8, 8);
         g.setColor(new Color(138, 174, 138));
         g.setStroke(new BasicStroke(1.0f));
         g.drawRoundRect(sx, sy, SCREEN_W, SCREEN_H, 8, 8);
+
+        // header
+        g.setColor(new Color(100, 140, 100));
+        g.setFont(new Font("Monospaced", Font.BOLD, 9));
+        FontMetrics fm = g.getFontMetrics();
+        String header = "INSULIN PUMP";
+        g.drawString(header, sx + (SCREEN_W - fm.stringWidth(header)) / 2, sy + 12);
+
+        // divider line
+        g.setColor(new Color(138, 174, 138));
+        g.drawLine(sx + 4, sy + 16, sx + SCREEN_W - 4, sy + 16);
+
+        // screen text (word-wrap by splitting on newlines)
+        g.setColor(new Color(44, 80, 44));
+        g.setFont(new Font("Monospaced", Font.PLAIN, 10));
+        fm = g.getFontMetrics();
+        String[] lines = screenText.split("\n");
+        for (int i = 0; i < lines.length; i++) {
+            g.drawString(lines[i], sx + 6, sy + 30 + (i * (fm.getHeight() + 2)));
+        }
     }
 
     /** Up and down triangle buttons to the right of the screen. */

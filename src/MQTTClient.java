@@ -41,6 +41,16 @@ public class MQTTClient implements MqttCallback {
             String timestamp = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
             Blackboard.getInstance().getPDA().addLogEntry("[" + timestamp + "] GLUCOSE: " + payload + " mg/dL");
         }
+        if (TOPIC_DOSE.equals(topic)) {
+            double dose = Double.parseDouble(payload);
+            Blackboard.getInstance().setInsulinDose(dose);
+
+            String timestamp = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+            Blackboard.getInstance().getInsulinPump().setScreenText(
+                "DOSE RECEIVED\n" + dose + " units\n" + timestamp
+            );
+            Blackboard.getInstance().getPDA().addLogEntry("[" + timestamp + "] DOSE: " + dose + " units");
+        }
     }
 
     @Override public void connectionLost(Throwable cause) {
