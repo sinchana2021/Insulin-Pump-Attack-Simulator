@@ -6,7 +6,8 @@
 # Make sure mosquitto is running
 if ! pgrep -x "mosquitto" > /dev/null; then
   echo "Starting Mosquitto broker..."
-  /usr/local/sbin/mosquitto -d
+#  /usr/local/sbin/mosquitto -d
+  /opt/homebrew/sbin/mosquitto -d
   sleep 1
 else
   echo "Mosquitto already running."

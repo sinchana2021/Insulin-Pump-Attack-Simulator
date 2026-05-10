@@ -1,6 +1,6 @@
 # Insulin Pump Attack Simulator
 
-A Java Swing simulation of an insulin pump system with MQTT communication between components: Glucose Sensor, PDA, Insulin Pump, and Remote Control.
+A Java Swing simulation of an insulin pump system with MQTT communication between components: Glucose Sensor, Panels.PDAPanel, Insulin Pump, and Remote Control.
 
 ## Prerequisites
 

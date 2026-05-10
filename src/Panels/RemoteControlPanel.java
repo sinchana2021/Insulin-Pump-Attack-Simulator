@@ -1,13 +1,15 @@
+package Panels;
+
 import java.awt.*;
 
 /**
- * RemoteControl renders a square remote with two labeled round buttons
+ * Panels.RemoteControl renders a square remote with two labeled round buttons
  * (S and B) and a rectangular ACT button below them.
  *
  * @author you
  * @version 1.0
  */
-public class RemoteControl {
+public class RemoteControlPanel {
 
     private int x;
     private int y;
@@ -17,7 +19,7 @@ public class RemoteControl {
     private static final int ACT_W     = 140;
     private static final int ACT_H     = 50;
 
-    public RemoteControl(int x, int y) {
+    public RemoteControlPanel(int x, int y) {
         this.x = x;
         this.y = y;
     }

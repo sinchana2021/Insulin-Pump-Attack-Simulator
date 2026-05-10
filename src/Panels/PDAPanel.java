@@ -1,16 +1,18 @@
+package Panels;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * PDA represents the Personal Data Assistant. Visualized as a handheld
+ * Panels.PDA represents the Personal Data Assistant. Visualized as a handheld
  * device with a dark log screen that displays a running list of commands
  * and glucose readings received over MQTT.
  *
  * @author you
  * @version 1.0
  */
-public class PDA {
+public class PDAPanel {
 
     private int x;
     private int y;
@@ -23,7 +25,7 @@ public class PDA {
 
     private final List<String> log = new ArrayList<>();
 
-    public PDA(int x, int y) {
+    public PDAPanel(int x, int y) {
         this.x = x;
         this.y = y;
     }

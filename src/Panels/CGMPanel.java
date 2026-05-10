@@ -1,15 +1,16 @@
-import javax.swing.*;
+package Panels;
+
 import java.awt.*;
 
 /**
- * GlucoseSensor represents the wearable circular patch that the patient
+ * CGM represents the wearable circular patch that the patient
  * applies directly to the skin. It continuously monitors interstitial
  * glucose levels and exposes a current reading for other components.
  *
  * @author you
  * @version 1.0
  */
-public class GlucoseSensor {
+public class CGMPanel {
 
     private int x;
     private int y;
@@ -19,7 +20,7 @@ public class GlucoseSensor {
     private static final int ADHESIVE_RADIUS = 50;
     private static final int HOUSING_RADIUS  = 35;
 
-    public GlucoseSensor(int x, int y) {
+    public CGMPanel(int x, int y) {
         this.x = x;
         this.y = y;
         this.glucoseLevel = 100.0; // default resting value

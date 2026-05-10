@@ -1,13 +1,15 @@
+package Panels;
+
 import java.awt.*;
 
 /**
- * InsulinPump renders a handheld insulin pump device with a screen,
+ * Panels.InsulinPump renders a handheld insulin pump device with a screen,
  * up/down triangle navigation buttons, and three circular action buttons.
  *
  * @author you
  * @version 1.0
  */
-public class InsulinPump {
+public class InsulinPumpPanel {
 
     private int x;
     private int y;
@@ -24,7 +26,7 @@ public class InsulinPump {
 
     public void setScreenText(String text) { this.screenText = text; }
 
-    public InsulinPump(int x, int y) {
+    public InsulinPumpPanel(int x, int y) {
         this.x = x;
         this.y = y;
         this.insulinDose = 0.0;
