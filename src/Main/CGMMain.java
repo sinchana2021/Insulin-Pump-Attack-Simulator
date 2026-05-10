@@ -19,7 +19,7 @@ public class CGMMain {
 
         frame.setVisible(true);
 
-        // !! Read from some json of commands to publish at multiple intervals i.e. every 10 seconds
+        // !! Read from some json of commands to publish at multiple intervals
         new Timer(3000, e -> {
             device.publishGlucose();
         }).start();

@@ -57,7 +57,7 @@ public class InsulinPumpDevice implements MessageHandler {
 
     }
 
-    private void deliverUnits(double units) {
+    public void deliverUnits(double units) {
         String screenText = "Delivering " + units + "units";
 
         this.sendUpdatedDose(units, screenText);
