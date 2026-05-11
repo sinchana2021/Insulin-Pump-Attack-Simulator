@@ -14,7 +14,7 @@ public class RemoteDevice {
 
     public RemoteDevice() {
         remote = new RemoteControlPanel(20,20);
-
+        this.devicePin = UUID.randomUUID();
         publisher = new MyPublisher("REMOTE");
     }
 
@@ -29,6 +29,19 @@ public class RemoteDevice {
         publisher.publish(
             "remote/command",
             msg);
+    }
+
+    public void sendStopCommand() {
+        Message msg = new Message(
+                "REMOTE",
+                devicePin,
+                "command",
+                "STOP",
+                counter++);
+
+        publisher.publish(
+                "remote/command",
+                msg);
     }
 
     public RemoteControlPanel getRemote() {

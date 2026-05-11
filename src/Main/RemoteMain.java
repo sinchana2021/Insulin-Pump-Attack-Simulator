@@ -1,7 +1,7 @@
 package Main;
 
 import Devices.RemoteDevice;
-import Panels.RemoteControlPanel;
+import Windows.RemoteWindow;
 
 import javax.swing.*;
 
@@ -14,7 +14,7 @@ public class RemoteMain {
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        frame.add(new RemoteControlPanel(device));
+        frame.add(new RemoteWindow(device));
 
         frame.setSize(300,300);
 
