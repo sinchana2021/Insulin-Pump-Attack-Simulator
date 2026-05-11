@@ -16,15 +16,10 @@ public class InsulinPumpMain {
 
         frame.add(new InsulinPumpWindow(device));
 
-        frame.setSize(400,300);
+        frame.setSize(400, 300);
+        frame.setLocation(400, 0);
 
         frame.setVisible(true);
 
-        // Every 30 seconds give dosage based on current dosage to give
-        new Timer(30000, e -> {
-            double insulinDose = device.getPump().getInsulinDose();
-
-            device.deliverUnits(insulinDose);
-        }).start();
     }
 }

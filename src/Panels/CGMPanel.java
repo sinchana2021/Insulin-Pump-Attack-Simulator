@@ -32,6 +32,7 @@ public class CGMPanel {
 
         drawAdhesiveRing(g2);
         drawSensorHousing(g2);
+        drawGlucoseText(g2);
     }
 
     /** Outer beige adhesive layer that sticks to the skin. */
@@ -54,6 +55,22 @@ public class CGMPanel {
         g.setStroke(new BasicStroke(1.0f));
         g.drawOval(x - HOUSING_RADIUS, y - HOUSING_RADIUS,
                    HOUSING_RADIUS * 2, HOUSING_RADIUS * 2);
+    }
+
+    private void drawGlucoseText(Graphics2D g) {
+        g.setFont(new Font("SansSerif", Font.BOLD, 12));
+
+        if (glucoseLevel < 70) {
+            g.setColor(new Color(220, 60, 60)); // low = red
+        } else if (glucoseLevel > 180) {
+            g.setColor(new Color(220, 140, 40)); // high = orange
+        } else {
+            g.setColor(new Color(60, 180, 100)); // normal = green
+        }
+
+        String text = String.format("Glucose: %.1f mg/dL", glucoseLevel);
+
+        g.drawString(text, x - 40, y + 80);
     }
 
     

@@ -1,0 +1,6 @@
+Publisher connected
+Subscribed to: cgm/glucose
+Subscribed to: remote/command
+Published: PUMP|4bfcce36-a838-4ef5-9316-699ab7063c45|status|2.0|0|0101
+Published: PUMP|4bfcce36-a838-4ef5-9316-699ab7063c45|status|2.0|1|0101
+Published: PUMP|4bfcce36-a838-4ef5-9316-699ab7063c45|status|2.0|2|0101

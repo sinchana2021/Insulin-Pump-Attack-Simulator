@@ -26,6 +26,8 @@ public class InsulinPumpWindow extends JPanel {
                     handlePumpClick(e.getX(), e.getY());
                 }
             });
+
+        new Timer(50, e -> repaint()).start();
     }
 
     @Override

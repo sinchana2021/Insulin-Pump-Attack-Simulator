@@ -28,7 +28,7 @@ public class PDADevice implements MessageHandler {
 
     @Override
     public void onMessage(Message msg) {
-        String line = msg.device + ": " + msg.payload;
+        String line = "[" + msg.type + "] " + msg.device + ": " + msg.payload;
 
         pda.addLogEntry(line);
     }

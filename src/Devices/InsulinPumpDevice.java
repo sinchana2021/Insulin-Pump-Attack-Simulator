@@ -6,7 +6,9 @@ import MQTT.MyPublisher;
 import MQTT.MySubscriber;
 import Panels.InsulinPumpPanel;
 
+import javax.swing.Timer;
 import java.util.UUID;
+
 
 public class InsulinPumpDevice implements MessageHandler {
 
@@ -16,10 +18,12 @@ public class InsulinPumpDevice implements MessageHandler {
     private UUID devicePin;
     private int myTargetGluose = 110;
     private int ISF = 50; // determines num of units
+    private Timer autoDoseTimer;
 
     public InsulinPumpDevice() {
         pump = new InsulinPumpPanel(20,20);
         publisher = new MyPublisher("PUMP");
+        this.devicePin = UUID.randomUUID();
 
         new MySubscriber(
             "PUMP",
@@ -30,6 +34,15 @@ public class InsulinPumpDevice implements MessageHandler {
             "PUMP",
             "remote/command",
             this);
+
+        autoDoseTimer = new Timer(30000, e -> {
+            double insulinDose = pump.getInsulinDose();
+            if (insulinDose > 0) {
+                deliverUnits(insulinDose);
+            }
+        });
+
+        autoDoseTimer.start();
     }
 
     // External messages from other devices
@@ -69,7 +82,7 @@ public class InsulinPumpDevice implements MessageHandler {
             "PUMP",
             devicePin,
             "status",
-            "Delivering " + dose, counter++);
+            String.valueOf(dose), counter++);
 
         publisher.publish("pump/status", msg);
 
@@ -107,4 +120,7 @@ public class InsulinPumpDevice implements MessageHandler {
         return pump;
     }
 
+
+
 }
+

@@ -1,7 +1,7 @@
 package Main;
 
 import Devices.PDADevice;
-import Panels.PDAPanel;
+import Windows.PDAWindow;
 
 import javax.swing.*;
 
@@ -14,9 +14,10 @@ public class PDAMain {
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        frame.add(new PDAPanel(device));
+        frame.add(new PDAWindow(device));
 
-        frame.setSize(250,350);
+        frame.setSize(400, 300);
+        frame.setLocation(0, 300);
 
         frame.setVisible(true);
     }

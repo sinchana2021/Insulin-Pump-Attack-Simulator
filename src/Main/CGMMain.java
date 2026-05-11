@@ -1,7 +1,7 @@
 package Main;
 
 import Devices.CGMDevice;
-import Panels.CGMPanel;
+import Windows.CGMWindow;
 
 import javax.swing.*;
 
@@ -13,15 +13,16 @@ public class CGMMain {
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        frame.add(new CGMPanel(device));
+        frame.add(new CGMWindow(device));
 
-        frame.setSize(300,300);
+        frame.setSize(400, 300);
+        frame.setLocation(0, 0);
 
         frame.setVisible(true);
 
-        // !! Read from some json of commands to publish at multiple intervals
-        new Timer(3000, e -> {
-            device.publishGlucose();
-        }).start();
+        // Reads from mock idea of glucose readings
+        Timer t = new Timer(10000, e -> device.publishGlucose());
+        t.setRepeats(true);
+        t.start();
     }
 }

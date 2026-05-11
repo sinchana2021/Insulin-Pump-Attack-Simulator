@@ -16,7 +16,8 @@ public class RemoteMain {
 
         frame.add(new RemoteWindow(device));
 
-        frame.setSize(300,300);
+        frame.setSize(400, 300);
+        frame.setLocation(400, 300);
 
         frame.setVisible(true);
     }
