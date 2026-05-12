@@ -16,7 +16,7 @@ public class PDAMain {
 
         frame.add(new PDAWindow(device));
 
-        frame.setSize(400, 300);
+        frame.setSize(400, 500);
         frame.setLocation(0, 300);
 
         frame.setVisible(true);

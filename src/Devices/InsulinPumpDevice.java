@@ -96,7 +96,7 @@ public class InsulinPumpDevice implements MessageHandler {
         double dose = pump.getInsulinDose();
 
         pump.setInsulinDose(dose + 1);
-        pump.setScreenText("Dose: " + pump.getInsulinDose());
+        pump.setScreenText("Dose: " + String.format("%.2f", pump.getInsulinDose()));
     }
 
     public void decreaseDose() {
@@ -106,14 +106,14 @@ public class InsulinPumpDevice implements MessageHandler {
             dose -= 1;
 
         pump.setInsulinDose(dose);
-        pump.setScreenText("Dose: " + pump.getInsulinDose());
+        pump.setScreenText("Dose: " + String.format("%.2f", pump.getInsulinDose()));
     }
 
     public void expressBOLUS() {
         double dose = 2.0;
 
         pump.setInsulinDose(dose);
-        pump.setScreenText("Dose: " + dose);
+        pump.setScreenText("Dose: " + String.format("%.2f", dose));
     }
 
     public InsulinPumpPanel getPump() {
