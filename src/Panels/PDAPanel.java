@@ -1,29 +1,31 @@
+package Panels;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * PDA represents the Personal Data Assistant. Visualized as a handheld
+ * Panels.PDA represents the Personal Data Assistant. Visualized as a handheld
  * device with a dark log screen that displays a running list of commands
  * and glucose readings received over MQTT.
  *
  * @author you
  * @version 1.0
  */
-public class PDA {
+public class PDAPanel {
 
     private int x;
     private int y;
 
-    private static final int BODY_W   = 150;
-    private static final int BODY_H   = 230;
-    private static final int SCREEN_W = 118;  // BODY_W - 32
-    private static final int SCREEN_H = 185;  // BODY_H - 45
-    private static final int MAX_LINES = 13; // max visible log lines
+    private static final int BODY_W   = 250;
+    private static final int BODY_H   = 380;
+    private static final int SCREEN_W = 218;  // BODY_W - 32
+    private static final int SCREEN_H = 335;  // BODY_H - 45
+    private static final int MAX_LINES = 100; // max visible log lines
 
     private final List<String> log = new ArrayList<>();
 
-    public PDA(int x, int y) {
+    public PDAPanel(int x, int y) {
         this.x = x;
         this.y = y;
     }
@@ -87,30 +89,43 @@ public class PDA {
     }
 
     /** Scrolling log entries on the screen. */
-    private void drawLog(Graphics2D g) {
-        int sx = x + (BODY_W - SCREEN_W) / 2 + 8;
-        int sy = y + 25 + 22 + 12; // below header
+    /** Scrolling log entries on the screen. */
+private void drawLog(Graphics2D g) {
+    int sx = x + (BODY_W - SCREEN_W) / 2 + 8;
+    int sy = y + 25 + 22 + 12; // below header
+    int screenBottom = y + 25 + SCREEN_H - 6; // bottom of screen with padding
 
-        g.setFont(new Font("Monospaced", Font.PLAIN, 9));
-        FontMetrics fm = g.getFontMetrics();
-        int lineH = fm.getHeight() + 2;
+    g.setFont(new Font("Monospaced", Font.PLAIN, 9));
+    FontMetrics fm = g.getFontMetrics();
+    int lineH = fm.getHeight() + 2;
 
-        for (int i = 0; i < log.size(); i++) {
-            String entry = log.get(i);
-            // colour alerts yellow, everything else green
-            if (entry.contains("ALERT")) {
-                g.setColor(new Color(204, 204, 68));
-            } else {
-                g.setColor(new Color(68, 204, 136));
-            }
-            g.drawString(entry, sx, sy + (i * lineH) + fm.getAscent());
+    // recalculate MAX_LINES dynamically based on actual screen space
+    int availableH = screenBottom - sy;
+    int maxVisible = availableH / lineH;
+
+    // only draw the last maxVisible entries
+    int startIdx = Math.max(0, log.size() - maxVisible);
+
+    for (int i = startIdx; i < log.size(); i++) {
+        String entry = log.get(i);
+        int drawY = sy + ((i - startIdx) * lineH) + fm.getAscent();
+        if (drawY > screenBottom) break; // safety clip
+
+        if (entry.contains("ALERT")) {
+            g.setColor(new Color(204, 204, 68));
+        } else {
+            g.setColor(new Color(68, 204, 136));
         }
+        g.drawString(entry, sx, drawY);
+    }
 
-        // blinking cursor at end of log
+    // blinking cursor at end of log
+    int cursorY = sy + ((log.size() - startIdx) * lineH) + fm.getAscent();
+    if (cursorY <= screenBottom) {
         g.setColor(new Color(68, 204, 136));
-        int cursorY = sy + (log.size() * lineH) + fm.getAscent();
         g.drawString("▮", sx, cursorY);
     }
+}
 
     // --- Getters / Setters ---
 

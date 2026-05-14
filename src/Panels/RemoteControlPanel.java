@@ -1,23 +1,25 @@
+package Panels;
+
 import java.awt.*;
 
 /**
- * RemoteControl renders a square remote with two labeled round buttons
+ * Panels.RemoteControl renders a square remote with two labeled round buttons
  * (S and B) and a rectangular ACT button below them.
  *
  * @author you
  * @version 1.0
  */
-public class RemoteControl {
+public class RemoteControlPanel {
 
     private int x;
     private int y;
 
     private static final int BODY_SIZE = 200;
     private static final int BTN_R     = 30;
-    private static final int ACT_W     = 140;
-    private static final int ACT_H     = 50;
+    // private static final int ACT_W     = 140;
+    // private static final int ACT_H     = 50;
 
-    public RemoteControl(int x, int y) {
+    public RemoteControlPanel(int x, int y) {
         this.x = x;
         this.y = y;
     }
@@ -28,7 +30,7 @@ public class RemoteControl {
 
         drawBody(g2);
         drawRoundButtons(g2);
-        drawActButton(g2);
+        //drawActButton(g2);
     }
 
     /** Square outer body with inset. */
@@ -70,25 +72,26 @@ public class RemoteControl {
         }
     }
 
+    // removed to simplify software implementation
     /** Rectangular ACT button below the round buttons. */
-    private void drawActButton(Graphics2D g) {
-        int actX = x + (BODY_SIZE - ACT_W) / 2;
-        int actY = y + 130;
+    // private void drawActButton(Graphics2D g) {
+    //     int actX = x + (BODY_SIZE - ACT_W) / 2;
+    //     int actY = y + 130;
 
-        g.setColor(new Color(200, 198, 193));
-        g.fillRoundRect(actX, actY, ACT_W, ACT_H, 16, 16);
-        g.setColor(new Color(136, 135, 128));
-        g.setStroke(new BasicStroke(1.0f));
-        g.drawRoundRect(actX, actY, ACT_W, ACT_H, 16, 16);
+    //     g.setColor(new Color(200, 198, 193));
+    //     g.fillRoundRect(actX, actY, ACT_W, ACT_H, 16, 16);
+    //     g.setColor(new Color(136, 135, 128));
+    //     g.setStroke(new BasicStroke(1.0f));
+    //     g.drawRoundRect(actX, actY, ACT_W, ACT_H, 16, 16);
 
-        g.setColor(new Color(44, 44, 42));
-        g.setFont(new Font("SansSerif", Font.BOLD, 14));
-        FontMetrics fm = g.getFontMetrics();
-        String label = "ACT";
-        g.drawString(label,
-                actX + (ACT_W - fm.stringWidth(label)) / 2,
-                actY + (ACT_H + fm.getAscent()) / 2 - 2);
-    }
+    //     g.setColor(new Color(44, 44, 42));
+    //     g.setFont(new Font("SansSerif", Font.BOLD, 14));
+    //     FontMetrics fm = g.getFontMetrics();
+    //     String label = "ACT";
+    //     g.drawString(label,
+    //             actX + (ACT_W - fm.stringWidth(label)) / 2,
+    //             actY + (ACT_H + fm.getAscent()) / 2 - 2);
+    // }
 
     // --- Getters / Setters ---
 

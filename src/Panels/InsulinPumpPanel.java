@@ -1,13 +1,15 @@
+package Panels;
+
 import java.awt.*;
 
 /**
- * InsulinPump renders a handheld insulin pump device with a screen,
+ * Panels.InsulinPump renders a handheld insulin pump device with a screen,
  * up/down triangle navigation buttons, and three circular action buttons.
  *
  * @author you
  * @version 1.0
  */
-public class InsulinPump {
+public class InsulinPumpPanel {
 
     private int x;
     private int y;
@@ -24,7 +26,7 @@ public class InsulinPump {
 
     public void setScreenText(String text) { this.screenText = text; }
 
-    public InsulinPump(int x, int y) {
+    public InsulinPumpPanel(int x, int y) {
         this.x = x;
         this.y = y;
         this.insulinDose = 0.0;
@@ -117,7 +119,7 @@ public class InsulinPump {
         int btnY = y + 152;
         int[] btnX = {x + 42, x + 100, x + 158};
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 1; i++) {
             g.setColor(new Color(200, 198, 193));
             g.fillOval(btnX[i] - BTN_R, btnY - BTN_R, BTN_R * 2, BTN_R * 2);
             g.setColor(new Color(136, 135, 128));
@@ -126,17 +128,17 @@ public class InsulinPump {
         }
 
         // back arrow on button 2
-        g.setColor(new Color(95, 94, 90));
-        int[] arrowX = {btnX[1] + 10, btnX[1] - 10, btnX[1] + 10};
-        int[] arrowY = {btnY - 8,     btnY,          btnY + 8};
-        g.fillPolygon(arrowX, arrowY, 3);
+        // g.setColor(new Color(95, 94, 90));
+        // int[] arrowX = {btnX[1] + 10, btnX[1] - 10, btnX[1] + 10};
+        // int[] arrowY = {btnY - 8,     btnY,          btnY + 8};
+        // g.fillPolygon(arrowX, arrowY, 3);
 
         // ACT label on button 3
-        g.setColor(new Color(44, 44, 42));
-        g.setFont(new Font("SansSerif", Font.BOLD, 11));
-        FontMetrics fm = g.getFontMetrics();
-        String act = "ACT";
-        g.drawString(act, btnX[2] - fm.stringWidth(act) / 2, btnY + fm.getAscent() / 2 - 1);
+        // g.setColor(new Color(44, 44, 42));
+        // g.setFont(new Font("SansSerif", Font.BOLD, 11));
+        // FontMetrics fm = g.getFontMetrics();
+        // String act = "ACT";
+        // g.drawString(act, btnX[2] - fm.stringWidth(act) / 2, btnY + fm.getAscent() / 2 - 1);
     }
 
     // --- Getters / Setters ---

@@ -1,38 +1,55 @@
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-
-public class Blackboard {
-    private static Blackboard instance;
-    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-
-    private double glucoseLevel = 100.0;  // mg/dL
-    private double insulinDose  = 0.0;    // units
-    private PDA pda = new PDA(380, 10);
-    private InsulinPump pump = new InsulinPump(250, 250);
-
-    public PDA getPDA() { return pda; }
-
-    public InsulinPump getInsulinPump() { return pump; }
-
-    public static Blackboard getInstance() {
-        if (instance == null) instance = new Blackboard();
-        return instance;
-    }
-
-    public double getGlucoseLevel() { return glucoseLevel; }
-    public void setGlucoseLevel(double v) {
-        double old = glucoseLevel;
-        glucoseLevel = v;
-        pcs.firePropertyChange("glucoseLevel", old, v);
-    }
-
-    public double getInsulinDose() { return insulinDose; }
-    public void setInsulinDose(double v) {
-        double old = insulinDose;
-        insulinDose = v;
-        pcs.firePropertyChange("insulinDose", old, v);
-    }
-
-    public void addPropertyChangeListener(PropertyChangeListener l) { pcs.addPropertyChangeListener(l); }
-    public void removePropertyChangeListener(PropertyChangeListener l) { pcs.removePropertyChangeListener(l); }
-}
+//import java.awt.*;
+//import java.beans.PropertyChangeSupport;
+//import java.util.Vector;
+//
+///**
+// * Blackboard is a singleton that holds the state of all players
+// * in the game, including "me".
+// *
+// * @author javiergs
+// * @version 1.0
+// */
+//public class Blackboard extends PropertyChangeSupport {
+//
+//    public static final String BROKER = "tcp://broker.hivemq.com:1883";
+//    public static final String TOPIC = "insulin";
+//    private int glucose;
+//    private String command;
+//    private String pumpStatus;
+//    private static volatile Blackboard instance;
+//
+//    private Blackboard() {
+//        super(new Object());
+//    }
+//
+//    public static Blackboard getInstance() {
+//        if (instance == null) {
+//            synchronized (Blackboard.class) {
+//                if (instance == null) {
+//                    instance = new Blackboard();
+//                }
+//            }
+//        }
+//        return instance;
+//    }
+//
+//    public void setGlucose(int value) {
+//        this.glucose = value;
+//        firePropertyChange("glucose", null, value);
+//    }
+//
+//    public int getGlucose() {
+//        return glucose;
+//    }
+//
+//    public void setCommand(String cmd) {
+//        this.command = cmd;
+//        firePropertyChange("command", null, cmd);
+//    }
+//
+//    public void setPumpStatus(String status) {
+//        this.pumpStatus = status;
+//        firePropertyChange("status", null, status);
+//    }
+//
+//}

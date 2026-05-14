@@ -1,27 +1,35 @@
 #!/bin/bash
 
-# Insulin Pump Simulator - build & run
-# Usage: ./run.sh
+echo "Checking Mosquitto..."
 
-# Make sure mosquitto is running
 if ! pgrep -x "mosquitto" > /dev/null; then
-  echo "Starting Mosquitto broker..."
-  /usr/local/sbin/mosquitto -d
-  sleep 1
-else
-  echo "Mosquitto already running."
+    echo "Starting Mosquitto..."
+#    /usr/local/sbin/mosquitto -d
+    /opt/homebrew/sbin/mosquitto -d
+    sleep 2
 fi
 
-# Clean and recompile
-echo "Compiling..."
-rm -rf out/
+echo "Cleaning..."
+rm -rf out
 mkdir out
-javac -cp "lib/org.eclipse.paho.client.mqttv3-1.2.5.jar" -d out src/*.java
+
+echo "Compiling..."
+
+javac \
+-cp "lib/org.eclipse.paho.client.mqttv3-1.2.5.jar" \
+-d out \
+$(find src -name "*.java")
 
 if [ $? -ne 0 ]; then
-  echo "Compilation failed. Fix errors above and try again."
-  exit 1
+    echo "Compilation failed."
+    exit 1
 fi
 
-echo "Running..."
-java -cp "out:lib/org.eclipse.paho.client.mqttv3-1.2.5.jar" Main
+echo "Launching devices..."
+
+nohup java -cp "out:lib/org.eclipse.paho.client.mqttv3-1.2.5.jar" Main.CGMMain > cgm.log 2>&1 &
+nohup java -cp "out:lib/org.eclipse.paho.client.mqttv3-1.2.5.jar" Main.InsulinPumpMain > pump.log 2>&1 &
+nohup java -cp "out:lib/org.eclipse.paho.client.mqttv3-1.2.5.jar" Main.RemoteMain > remote.log 2>&1 &
+nohup java -cp "out:lib/org.eclipse.paho.client.mqttv3-1.2.5.jar" Main.PDAMain > pda.log 2>&1 &
+
+echo "All devices launched."
