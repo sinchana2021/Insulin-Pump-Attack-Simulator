@@ -1,3 +1,5 @@
 Publisher connected
-Published: REMOTE|eb662b8c-1eb0-4b86-8196-54fce65bcd1d|command|BOLUS|0|0101
-Published: REMOTE|eb662b8c-1eb0-4b86-8196-54fce65bcd1d|command|STOP|1|0101
+CRC3101DEVICEREMOTE
+Published: REMOTE|2b94edc4-6eb4-440f-bab8-e7806e3638a2|command|BOLUS|0|3101|0101
+CRC2119DEVICEREMOTE
+Published: REMOTE|2b94edc4-6eb4-440f-bab8-e7806e3638a2|command|STOP|1|2119|0101

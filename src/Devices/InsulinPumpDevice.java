@@ -20,6 +20,8 @@ public class InsulinPumpDevice implements MessageHandler {
     private int ISF = 50; // determines num of units
     private Timer autoDoseTimer;
 
+    private int lastCounter = -1;
+
     public InsulinPumpDevice() {
         pump = new InsulinPumpPanel(20,20);
         publisher = new MyPublisher("PUMP");
@@ -48,6 +50,20 @@ public class InsulinPumpDevice implements MessageHandler {
     // External messages from other devices
     @Override
     public void onMessage(Message msg) {
+        System.out.println(msg.counter);
+        System.out.println(lastCounter);
+        if (msg.counter == lastCounter) {
+            System.out.println("DROP: replay detected");
+            return;
+        }
+        lastCounter = msg.counter;
+
+        if (!msg.isValid()) {
+            System.out.println("DROP: CRC failed");
+            return;
+        }
+
+
         // subscriber to CGM
         if(msg.type.equals("glucose")) { // subscriber to CGM
             double glucose = Double.parseDouble(msg.payload);
