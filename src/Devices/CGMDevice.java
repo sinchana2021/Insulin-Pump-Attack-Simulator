@@ -102,11 +102,25 @@ public class CGMDevice implements MessageHandler {
 
     @Override
     public void onMessage(Message msg) {
+
+        if (!msg.isValid()) {
+            System.out.println("CGM dropped bad CRC packet");
+            return;
+        }
+
+        String[] data = msg.decryptData();
+
+        String payload = data[0];
+
         if (msg.type.equals("status")) {
-            double units = Double.parseDouble(msg.payload);
+
+            double units =
+                    Double.parseDouble(payload);
 
             insulinEffect += units * 6;
-            if (insulinEffect > 100) insulinEffect = 100;
+
+            if (insulinEffect > 100)
+                insulinEffect = 100;
         }
     }
 }

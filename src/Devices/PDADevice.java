@@ -28,15 +28,17 @@ public class PDADevice implements MessageHandler {
 
     @Override
     public void onMessage(Message msg) {
-    String payload = msg.payload;
-    try {
-        payload = String.format("%.2f", Double.parseDouble(msg.payload));
-    } catch (NumberFormatException e) {
-        // not a number (e.g. STOP, BOLUS), leave as-is
+        String[] data = msg.decryptData();
+
+        String payload = data[0];
+        try {
+            payload = String.format("%.2f", Double.parseDouble(payload));
+        } catch (NumberFormatException e) {
+            // not a number (e.g. STOP, BOLUS), leave as-is
+        }
+        String line = "[" + msg.type + "] " + msg.device + ": " + payload;
+        pda.addLogEntry(line);
     }
-    String line = "[" + msg.type + "] " + msg.device + ": " + payload;
-    pda.addLogEntry(line);
-}
 
     public PDAPanel getPDA() {
         return pda;

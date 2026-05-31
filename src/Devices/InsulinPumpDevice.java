@@ -50,23 +50,32 @@ public class InsulinPumpDevice implements MessageHandler {
     // External messages from other devices
     @Override
     public void onMessage(Message msg) {
-        System.out.println(msg.counter);
-        System.out.println(lastCounter);
-        if (msg.counter == lastCounter) {
-            System.out.println("DROP: replay detected");
-            return;
-        }
-        lastCounter = msg.counter;
-
         if (!msg.isValid()) {
-            System.out.println("DROP: CRC failed");
+            System.out.println("BAD CRC - packet dropped");
             return;
         }
 
+        String[] data =
+                msg.decryptData();
+
+        String payload = data[0];
+
+        int counter =
+                Integer.parseInt(data[1]);
+
+
+        if (counter <= lastCounter) {
+            System.out.println(
+                    "REPLAY ATTACK DETECTED"
+            );
+            return;
+        }
+
+        lastCounter = counter;
 
         // subscriber to CGM
         if(msg.type.equals("glucose")) { // subscriber to CGM
-            double glucose = Double.parseDouble(msg.payload);
+            double glucose = Double.parseDouble(payload);
 
             if (glucose > myTargetGluose) {
                 double unitsCorrection = (glucose - myTargetGluose) / ISF;
@@ -76,14 +85,13 @@ public class InsulinPumpDevice implements MessageHandler {
         }
         // subscriber to Remote
         else if (msg.type.equals("command")) {
-            if (msg.payload.equals("BOLUS")) {
-                this.deliverUnits(2.0);
+            if (payload.equals("BOLUS")) {
+                deliverUnits(2.0);
             }
-            else if (msg.payload.equals("STOP")) {
-                this.deliverUnits(0.0);
+            else if (payload.equals("STOP")) {
+                deliverUnits(0.0);
             }
         }
-
     }
 
     public void deliverUnits(double units) {
