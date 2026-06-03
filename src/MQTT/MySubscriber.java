@@ -36,7 +36,6 @@ public class MySubscriber implements MqttCallback {
 
     @Override
     public void messageArrived(String topic, MqttMessage mqttMessage) {
-
         String payload = new String(mqttMessage.getPayload());
 
         Message msg = Message.deserialize(payload);

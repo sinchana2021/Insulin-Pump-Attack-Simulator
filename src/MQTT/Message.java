@@ -21,11 +21,9 @@ public class Message {
         String secureData =
                 payload + "|" + counter;
 
-        this.encryptedData =
-                CryptoUtil.encrypt(secureData);
+        this.encryptedData = CryptoUtil.encrypt(secureData);
 
-        this.crc =
-                CRC12.compute(toBitStringNoCRC());
+        this.crc = CRC12.compute(toBitStringNoCRC());
 
         this.lastBits = "0101";
 
@@ -53,9 +51,7 @@ public class Message {
     }
 
     public String[] decryptData() {
-
-        String decrypted =
-                CryptoUtil.decrypt(encryptedData);
+        String decrypted = CryptoUtil.decrypt(encryptedData);
 
         return decrypted.split("\\|");
     }

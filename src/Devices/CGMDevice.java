@@ -102,7 +102,6 @@ public class CGMDevice implements MessageHandler {
 
     @Override
     public void onMessage(Message msg) {
-
         if (!msg.isValid()) {
             System.out.println("CGM dropped bad CRC packet");
             return;
